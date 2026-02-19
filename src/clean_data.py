@@ -1,10 +1,14 @@
 import pandas as pd
 import numpy as np
+from src.load_data import load_data
+from pathlib import Path
 
+def clean_data() -> pd.DataFrame:
 
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
+    df = load_data()
 
-    drop_cols = ["listing_url", "scrape_id", "last_scraped", "name",
+    #dropping columns that are not relevant for our analysis
+    drop_cols = ["listing_url", "scrape_id", "name",
               "neighborhood_overview","description","source","picture_url", "host_url", "host_id",
                 "host_thumbnail_url", "host_picture_url", "estimated_occupancy_l365d", "estimated_revenue_l365d",
                  "host_about", "host_location" ,"host_name", "neighbourhood_cleansed", "neighbourhood",
@@ -16,4 +20,26 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
                    "license"]
     
     df.drop(columns=drop_cols, inplace=True)
-    return df
+    #dropping rows with missing values
+    df.dropna(inplace=True)
+
+    # converting data types to correct types
+    df["host_response_time"] = df["host_response_time"].astype("category")
+    df["host_is_superhost"] = df["host_is_superhost"].map({"t": 1, "f": 0}).astype("int8")
+    df["host_identity_verified"] = df["host_identity_verified"].map({"t": 1, "f": 0}).astype("int8")
+    df["last_scraped"] = pd.to_datetime(df["last_scraped"])
+    df["host_since"] = pd.to_datetime(df["host_since"])
+    df["host_response_rate"] = df["host_response_rate"].str.rstrip("%").astype("float") / 100
+    df["price"] = df["price"].str.replace("$", "").str.replace(",", "").astype("float")
+    df["first_review"] = pd.to_datetime(df["first_review"])
+    df["last_review"] = pd.to_datetime(df["last_review"])
+    df["instant_bookable"] = df["instant_bookable"].map({"t": 1, "f": 0}).astype("int8")
+    df["host_has_profile_pic"] = df["host_has_profile_pic"].map({"t": 1, "f": 0}).astype("int8")
+    df["host_verifications"] = df["host_verifications"].apply(lambda x: len(x.strip("[]").split(", ")) if pd.notnull(x) else 0).astype("int8")
+    df["host_acceptance_rate"] = df["host_acceptance_rate"].str.rstrip("%").astype("float") / 100
+
+
+    Path("../data/processed").mkdir(parents=True, exist_ok=True)
+    df.to_csv("../data/processed/clean_listings.csv", index=False)
+
+    return None

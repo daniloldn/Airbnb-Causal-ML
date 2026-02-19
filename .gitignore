@@ -1,2 +1,3 @@
 Plan/
 *.csv
+__pycache__/
