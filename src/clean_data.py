@@ -8,7 +8,7 @@ def clean_data() -> pd.DataFrame:
     df = load_data()
 
     #dropping columns that are not relevant for our analysis
-    drop_cols = ["listing_url", "scrape_id", "name",
+    drop_cols = ["listing_url", "name",
               "neighborhood_overview","description","source","picture_url", "host_url", "host_id",
                 "host_thumbnail_url", "host_picture_url", "estimated_occupancy_l365d", "estimated_revenue_l365d",
                  "host_about", "host_location" ,"host_name", "neighbourhood_cleansed", "neighbourhood",
