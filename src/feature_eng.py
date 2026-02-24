@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from src.load_data import load_processed
 from pathlib import Path
+from sklearn.cluster import KMeans
 
 
 def feature_eng() -> pd.DataFrame:
@@ -36,10 +37,16 @@ def feature_eng() -> pd.DataFrame:
     df["private"] = df["property_type"].apply(lambda x: 1 if "Private" in x else 0)
 
  
+    #fixed effects
+    K = 100  
+    kmeans = KMeans(n_clusters=K, random_state=42, n_init=10)
+    df["loc_fe"] = kmeans.fit_predict(df[["x", "y"]])
+    
     #dropping columns no longer needed
     df.drop(columns=["last_scraped", "host_since", "description", "host_about",
                       "neighborhood_overview", "host_response_time", "property_type", 
-                      "price"], inplace=True)
+                      "price", "latitude", "longitude", 
+                      ], inplace=True)
     
     #dropping rows with missing values
     df.dropna(inplace=True)
