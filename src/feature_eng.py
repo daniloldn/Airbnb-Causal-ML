@@ -19,7 +19,9 @@ def feature_eng() -> pd.DataFrame:
     else 2 if x == "within a few hours" 
     else 3 if x == "within a day"
     else 4
-)
+)   
+    #log price
+    df["log_price"] = np.log(df["price"])
 
 
     #converting categorical variables
@@ -33,11 +35,17 @@ def feature_eng() -> pd.DataFrame:
     df["entire"] = df["property_type"].apply(lambda x: 1 if "Entire" in x else 0)
     df["private"] = df["property_type"].apply(lambda x: 1 if "Private" in x else 0)
 
-    #dropping rows with missing values
-    df.dropna(inplace=True)
-
+ 
     #dropping columns no longer needed
     df.drop(columns=["last_scraped", "host_since", "description", "host_about",
-                      "neighborhood_overview", "host_response_time", "property_type"], inplace=True)
+                      "neighborhood_overview", "host_response_time", "property_type", 
+                      "price"], inplace=True)
+    
+    #dropping rows with missing values
+    df.dropna(inplace=True)
+    
+    #saving the data
+    Path("../data/feature").mkdir(parents=True, exist_ok=True)
+    df.to_csv("../data/feature/listings_features.csv", index=False)
 
     return None
