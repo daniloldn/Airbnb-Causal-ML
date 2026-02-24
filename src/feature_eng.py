@@ -5,6 +5,7 @@ from load_data import load_processed, FEATURE
 from sklearn.cluster import KMeans
 from pyproj import Transformer
 from sklearn.neighbors import BallTree
+import ast
 
 
 def feature_eng() -> pd.DataFrame:
@@ -62,13 +63,22 @@ def feature_eng() -> pd.DataFrame:
     df["rivals_500m"] = [len(i) - 1 for i in indices]
     #log treatment
     df["log_rivals_500m"] = np.log1p(df["rivals_500m"])
+
+    #amenities
+    df["amenities_list"] = df["amenities"].apply(ast.literal_eval)
+    all_amenities = df["amenities_list"].explode()
+    top_amenities = all_amenities.value_counts().head(30).index
+    for amenity in top_amenities:
+        df[f"amenity_{amenity}"] = df["amenities_list"].apply(
+        lambda x: int(amenity in x)
+    )
     
     #dropping columns no longer needed
     df.drop(columns=["last_scraped", "host_since", "description", "host_about",
                       "neighborhood_overview", "host_response_time", "property_type", 
                       "price", "latitude", "longitude", "neighbourhood_cleansed",
                       "x", "y", "rivals_500m", "id", "scrape_id", "first_review", "last_review",
-                      "room_type"
+                      "room_type", "amenities_list", "amenities"
                       ], inplace=True)
     
     #dropping rows with missing values
