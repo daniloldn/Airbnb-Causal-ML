@@ -5,7 +5,12 @@ from feature_eng import feature_eng
 
 def main():
 
+
+    print("calling clean_data")
+
     clean_data()
+
+    print("calling feature_eng")
 
     feature_eng()
 

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from load_data import load_data
 from pathlib import Path
+from load_data import load_data, PROCESSED
 
 def clean_data() -> pd.DataFrame:
 
@@ -11,7 +11,7 @@ def clean_data() -> pd.DataFrame:
     drop_cols = ["listing_url", "name",
                   "source","picture_url", "host_url", "host_id",
                 "host_thumbnail_url", "host_picture_url", "estimated_occupancy_l365d", "estimated_revenue_l365d",
-                  "host_location" ,"host_name", "neighbourhood_cleansed", "neighbourhood",
+                  "host_location" ,"host_name", "neighbourhood_group_cleansed", "neighbourhood",
                   "availability_30", "availability_60", "availability_90", "availability_365", "availability_eoy",
                    "minimum_minimum_nights", "maximum_minimum_nights", "minimum_maximum_nights", "maximum_maximum_nights",
                    "minimum_nights_avg_ntm", "maximum_nights_avg_ntm", "calendar_updated", "calendar_last_scraped",
@@ -33,7 +33,7 @@ def clean_data() -> pd.DataFrame:
     df["host_acceptance_rate"] = df["host_acceptance_rate"].str.rstrip("%").astype("float") / 100
 
 
-    Path("../data/processed").mkdir(parents=True, exist_ok=True)
-    df.to_csv("../data/processed/clean_listings.csv", index=False)
+    Path(PROCESSED).parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(PROCESSED, index=False)
 
     return None

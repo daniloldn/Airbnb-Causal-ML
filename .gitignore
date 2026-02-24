@@ -1,4 +1,4 @@
 Plan/
 *.csv
 __pycache__/
-
+.vscode/

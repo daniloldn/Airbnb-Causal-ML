@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from src.load_data import load_processed
 from pathlib import Path
+from load_data import load_processed, FEATURE
 from sklearn.cluster import KMeans
 from pyproj import Transformer
 from sklearn.neighbors import BallTree
@@ -10,6 +10,7 @@ from sklearn.neighbors import BallTree
 def feature_eng() -> pd.DataFrame:
 
     df = load_processed()
+
 
 
     #host features
@@ -28,9 +29,9 @@ def feature_eng() -> pd.DataFrame:
 
 
     #converting categorical variables
-    df["host_is_superhost"] = df["host_is_superhost"].map({"t": 1, "f": 0}).astype("int8")
-    df["host_identity_verified"] = df["host_identity_verified"].map({"t": 1, "f": 0}).astype("int8")
-    df["host_has_profile_pic"] = df["host_has_profile_pic"].map({"t": 1, "f": 0}).astype("int8")
+    df["host_is_superhost"] = df["host_is_superhost"].map({"t": 1, "f": 0}).astype("Int8")
+    df["host_identity_verified"] = df["host_identity_verified"].map({"t": 1, "f": 0}).astype("Int8")
+    df["host_has_profile_pic"] = df["host_has_profile_pic"].map({"t": 1, "f": 0}).astype("Int8")
     
     
     #property dummies
@@ -66,14 +67,15 @@ def feature_eng() -> pd.DataFrame:
     df.drop(columns=["last_scraped", "host_since", "description", "host_about",
                       "neighborhood_overview", "host_response_time", "property_type", 
                       "price", "latitude", "longitude", "neighbourhood_cleansed",
-                      "x", "y", "rivals_500m"
+                      "x", "y", "rivals_500m", "id", "scrape_id", "first_review", "last_review",
+                      "room_type"
                       ], inplace=True)
     
     #dropping rows with missing values
     df.dropna(inplace=True)
     
     #saving the data
-    Path("../data/feature").mkdir(parents=True, exist_ok=True)
-    df.to_csv("../data/feature/listings_features.csv", index=False)
+    Path(FEATURE).parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(FEATURE, index=False)
 
     return None
