@@ -54,6 +54,12 @@ def feature_eng() -> pd.DataFrame:
     kmeans = KMeans(n_clusters=K, random_state=42, n_init=10)
     df["loc_fe"] = kmeans.fit_predict(df[["x", "y"]])
 
+    #fe dummies
+    fe_dummies = pd.get_dummies(df["loc_fe"], prefix="fe", drop_first=True)
+    df = pd.concat([df, fe_dummies], axis=1)
+
+
+
     #treatment variable
     coords = df[["x", "y"]].values
     tree = BallTree(coords, metric="euclidean")
