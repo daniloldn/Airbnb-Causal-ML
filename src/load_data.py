@@ -6,3 +6,6 @@ def load_data() -> pd.DataFrame:
 
 def load_processed() -> pd.DataFrame:
     return pd.read_csv("../data/processed/clean_listings.csv")
+
+def load_feature() -> pd.DataFrame:
+    return pd.read_csv("../data/feature/listings_features.csv")
