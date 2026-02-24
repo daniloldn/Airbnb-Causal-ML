@@ -22,7 +22,6 @@ def clean_data() -> pd.DataFrame:
     df.drop(columns=drop_cols, inplace=True)
 
     # converting data types to correct types
-    df["host_response_time"] = df["host_response_time"].astype("category")
     df["last_scraped"] = pd.to_datetime(df["last_scraped"])
     df["host_since"] = pd.to_datetime(df["host_since"])
     df["host_response_rate"] = df["host_response_rate"].str.rstrip("%").astype("float") / 100

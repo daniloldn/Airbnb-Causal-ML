@@ -3,6 +3,8 @@ import numpy as np
 from src.load_data import load_processed
 from pathlib import Path
 from sklearn.cluster import KMeans
+from pyproj import Transformer
+from sklearn.neighbors import BallTree
 
 
 def feature_eng() -> pd.DataFrame:
@@ -15,12 +17,12 @@ def feature_eng() -> pd.DataFrame:
     df["desc_dummy"] = df["description"].apply(lambda x: 0 if pd.isnull(x) else 1)
     df["about_dummy"] = df["host_about"].apply(lambda x: 0 if pd.isnull(x) else 1)
     df["overveiw_dummy"] = df["neighborhood_overview"].apply(lambda x: 0 if pd.isnull(x) else 1)
-    df["cat_response_time"] = df["host_response_time"].apply(
-    lambda x: 1 if x == "within an hour" 
-    else 2 if x == "within a few hours" 
-    else 3 if x == "within a day"
-    else 4
-)   
+    df["host_response_time"] = pd.Categorical(
+    df["host_response_time"],
+    categories=["within an hour", "within a few hours", "within a day", "a few days or more"],
+    ordered=True)
+
+  
     #log price
     df["log_price"] = np.log(df["price"])
 
@@ -36,16 +38,35 @@ def feature_eng() -> pd.DataFrame:
     df["entire"] = df["property_type"].apply(lambda x: 1 if "Entire" in x else 0)
     df["private"] = df["property_type"].apply(lambda x: 1 if "Private" in x else 0)
 
+    #borough FE
+    dummies = pd.get_dummies(df["neighbourhood_cleansed"], prefix="borough", drop_first=True)
+    df = pd.concat([df, dummies], axis=1)
  
     #fixed effects
+    transformer = Transformer.from_crs("EPSG:4326", "EPSG:27700", always_xy=True)
+    x, y = transformer.transform(df["longitude"].values,
+                             df["latitude"].values)
+    df["x"] = x
+    df["y"] = y
     K = 100  
     kmeans = KMeans(n_clusters=K, random_state=42, n_init=10)
     df["loc_fe"] = kmeans.fit_predict(df[["x", "y"]])
+
+    #treatment variable
+    coords = df[["x", "y"]].values
+    tree = BallTree(coords, metric="euclidean")
+    radius = 500
+    # query neighbors within radius
+    indices = tree.query_radius(coords, r=radius)
+    df["rivals_500m"] = [len(i) - 1 for i in indices]
+    #log treatment
+    df["log_rivals_500m"] = np.log1p(df["rivals_500m"])
     
     #dropping columns no longer needed
     df.drop(columns=["last_scraped", "host_since", "description", "host_about",
                       "neighborhood_overview", "host_response_time", "property_type", 
-                      "price", "latitude", "longitude", 
+                      "price", "latitude", "longitude", "neighbourhood_cleansed",
+                      "x", "y", "rivals_500m"
                       ], inplace=True)
     
     #dropping rows with missing values
