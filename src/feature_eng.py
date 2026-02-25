@@ -70,6 +70,11 @@ def feature_eng() -> pd.DataFrame:
     #log treatment
     df["log_rivals_500m"] = np.log1p(df["rivals_500m"])
 
+    #centered treatment
+    mean_x = df["log_rivals_500m"].mean()
+    df["log_rivals_c"] = df["log_rivals_500m"] - mean_x
+    df["log_rivals_c_sq"] = df["log_rivals_c"] ** 2
+
     #amenities
     df["amenities_list"] = df["amenities"].apply(ast.literal_eval)
     all_amenities = df["amenities_list"].explode()
@@ -86,6 +91,12 @@ def feature_eng() -> pd.DataFrame:
                       "x", "y", "rivals_500m", "id", "scrape_id", "first_review", "last_review",
                       "room_type", "amenities_list", "amenities"
                       ], inplace=True)
+    
+    #scaling variables
+    df["maximum_nights"] = np.log1p(df["maximum_nights"])
+    df["host_total_listings_count"] = np.log1p(df["host_total_listings_count"])
+    df["host_listings_count"] = np.log1p(df["host_listings_count"])
+ 
     
     #dropping rows with missing values
     df.dropna(inplace=True)

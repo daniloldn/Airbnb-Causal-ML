@@ -17,7 +17,8 @@ def clean_data() -> pd.DataFrame:
                    "minimum_nights_avg_ntm", "maximum_nights_avg_ntm", "calendar_updated", "calendar_last_scraped",
                    "has_availability","host_neighbourhood", "bathrooms_text",
                    "number_of_reviews_ltm", "number_of_reviews_l30d", "number_of_reviews_ly","reviews_per_month",
-                   "license"]
+                   "license", "calculated_host_listings_count_entire_homes","calculated_host_listings_count_private_rooms",
+                   "calculated_host_listings_count_shared_rooms"]
     
     df.drop(columns=drop_cols, inplace=True)
 

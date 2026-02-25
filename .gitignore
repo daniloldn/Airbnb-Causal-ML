@@ -2,3 +2,4 @@ Plan/
 *.csv
 __pycache__/
 .vscode/
+airbnb_causal_ml.egg-info
