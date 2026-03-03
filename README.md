@@ -1,6 +1,6 @@
 # Airbnb-Causal-ML
 
-This repo shows how nearby competition affects Airbnb prices in London. We:
+This repo shows how nearby competition affects Airbnb prices in London. I:
 - clean the public Inside Airbnb dataset,
 - add intuitive features (amenities, spatial clusters, rival counts),
 - compare standard econometrics (OLS, Post-Double Selection) with causal ML (Double Machine Learning, Causal Forest).
